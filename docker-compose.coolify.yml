@@ -24,9 +24,12 @@ services:
       - HERMES_DASHBOARD_PORT=9119
       - HERMES_DASHBOARD_BASIC_AUTH_USERNAME=${HERMES_DASHBOARD_BASIC_AUTH_USERNAME:?set in Coolify}
       - HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=${HERMES_DASHBOARD_BASIC_AUTH_PASSWORD:?set in Coolify}
+      # OpenAI-compatible API server (bearer-key auth; key is mandatory).
+      - API_SERVER_HOST=0.0.0.0
+      - API_SERVER_KEY=${API_SERVER_KEY:?set in Coolify}
     expose:
       - "9119"
-    command: ["gateway", "run"]
+      - "8642"
 
 volumes:
   hermes-data:
