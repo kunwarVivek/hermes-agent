@@ -1,0 +1,32 @@
+# Coolify deployment for Hermes Agent (fork-only file; upstream docker-compose.yml untouched).
+#
+# Differences from docker-compose.yml:
+#   - Single container: the dashboard runs inside the gateway container via the
+#     image's s6 `dashboard` slot (HERMES_DASHBOARD=1) instead of a second
+#     service reusing an unbuilt `hermes-agent` image (which breaks
+#     `docker compose pull` on Coolify).
+#   - Bridge networking + Traefik routing instead of network_mode: host and
+#     fixed container_name (both incompatible with Coolify).
+#   - Named volume instead of the ~/.hermes bind mount.
+#   - Dashboard binds 0.0.0.0, so the image's auth gate requires
+#     HERMES_DASHBOARD_BASIC_AUTH_USERNAME/_PASSWORD (set in Coolify env).
+services:
+  gateway:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - hermes-data:/opt/data
+    environment:
+      - HERMES_UID=${HERMES_UID:-10000}
+      - HERMES_GID=${HERMES_GID:-10000}
+      - HERMES_DASHBOARD=1
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_BASIC_AUTH_USERNAME=${HERMES_DASHBOARD_BASIC_AUTH_USERNAME:?set in Coolify}
+      - HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=${HERMES_DASHBOARD_BASIC_AUTH_PASSWORD:?set in Coolify}
+    expose:
+      - "9119"
+    command: ["gateway", "run"]
+
+volumes:
+  hermes-data:
