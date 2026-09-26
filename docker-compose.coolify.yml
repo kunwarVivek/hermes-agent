@@ -30,6 +30,7 @@ services:
     expose:
       - "9119"
       - "8642"
+    command: ["gateway", "run"]
 
 volumes:
   hermes-data:
